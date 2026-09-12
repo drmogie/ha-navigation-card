@@ -1,12 +1,31 @@
 # HA Navigation Card
 
-A background (non-visual) Home Assistant Lovelace card that watches for user
-inactivity on a kiosk/wall-mounted dashboard and automatically navigates to
-an "idle" view (e.g. a screensaver dashboard). As soon as the user interacts
-again, it navigates back to your normal "home" view.
+A background (non-visual by default) Home Assistant Lovelace card for
+kiosk/wall-mounted dashboards. It drives navigation between views based on
+idle timeout, motion, or touch - no automations or scripts required.
 
 Designed for Lovelace **Sections** dashboards on current Home Assistant
 releases, with a full visual (GUI) configuration editor - no YAML required.
+
+## Modes
+
+Pick one `navigation_mode` per card instance - a dashboard typically uses
+more than one card, each in a different mode, on different views:
+
+| Mode | Behavior |
+|---|---|
+| `back` | On idle timeout, calls `history.back()`. One-shot. |
+| `path` | On idle timeout, navigates to `navigation_path`. One-shot. |
+| `screensaver` | No idle timeout of its own - always listening for activity (mouse, touch, keyboard, scroll, or a `motion_entity`). On activity, navigates to `navigation_path` if set, otherwise back to wherever you came from (tracked automatically). |
+| `none` | Disabled entirely. |
+
+A typical kiosk setup: a "menu" view has a `path`-mode card that idles out
+to a "screensaver" view. The screensaver view has its own card in
+`screensaver` mode - no timeout needed there - which just waits for a
+touch/motion/click and sends you back to the menu.
+
+The idle counter for `back`/`path` always resets fresh whenever the card
+mounts (page load or return) and on any real activity event.
 
 ## Installation
 
@@ -22,36 +41,62 @@ releases, with a full visual (GUI) configuration editor - no YAML required.
 
 [![Open your Home Assistant instance and show your dashboard resources.](https://my.home-assistant.io/badges/lovelace_resources.svg)](https://my.home-assistant.io/redirect/lovelace_resources/)
 
-1. Copy `ha-navigation-card.js` and `ha-navigation-card-editor.js` into
-   `config/www/ha-navigation-card/`.
+1. Copy `ha-navigation-card.js` into `config/www/ha-navigation-card/`.
 2. Add the resource in **Settings > Dashboards > Resources**:
    - URL: `/local/ha-navigation-card/ha-navigation-card.js`
    - Type: JavaScript Module
 
+> **Requires internet access.** The card loads Lit from a public CDN
+> (`unpkg.com`) at runtime. If your Home Assistant instance can't reach the
+> internet, or your network blocks `unpkg.com`, the card will fail to load.
+
 ## Usage
 
-Add a new card to any dashboard view (this card renders nothing visible, so
-placement on the page doesn't matter) and configure it with the GUI editor,
-or with YAML:
+Add a card to any dashboard view and configure it with the GUI editor, or
+with YAML. Example - a menu view that idles out to a screensaver:
 
 ```yaml
+# On the "menu" view
 type: custom:ha-navigation-card
-idle_seconds: 60
-idle_path: /lovelace-kiosk/screensaver
-wake_path: /lovelace-kiosk/home
-only_watch_path: /lovelace-kiosk/home
+navigation_mode: path
+timeout: 60
+navigation_path: /lovelace-kiosk/screensaver
 ```
 
-| Option | Required | Default | Description |
+```yaml
+# On the "screensaver" view
+type: custom:ha-navigation-card
+navigation_mode: screensaver
+motion_entity: binary_sensor.hallway_motion
+wake_on_touch: true
+```
+
+| Option | Applies to | Default | Description |
 |---|---|---|---|
-| `idle_seconds` | No | `60` | Seconds of inactivity before navigating to `idle_path`. |
-| `idle_path` | **Yes** | - | Dashboard path to navigate to when idle (your screensaver view). |
-| `wake_path` | No | - | Dashboard path to return to when the user interacts while on `idle_path`. |
-| `only_watch_path` | No | - | If set, the idle timer only arms while on this exact path. Leave blank to arm it on every view except `idle_path`. |
+| `navigation_mode` | all | `screensaver` | `back` \| `path` \| `screensaver` \| `none` |
+| `timeout` | `back`, `path` | `60` | Seconds of no activity before entering the target. Minimum `3`. |
+| `navigation_path` | `path` (required), `screensaver` (optional) | - | `path` mode: destination to navigate to. `screensaver` mode: optional override for the wake destination; leave blank to return to wherever you came from. |
+| `show_progress` | `back`, `path` | auto | Show the idle countdown progress bar. Leave unset for the default (on for `back`, off otherwise). |
+| `debug` | all | `false` | Shows a debug panel with live status, activity counts, and motion-sensor state. |
+| `motion_entity` | `screensaver` | - | An entity (typically a `binary_sensor`) that wakes the display when it matches `motion_active_state`. |
+| `motion_active_state` | `screensaver` | `on` | State value that counts as "motion detected". Forced to `on` automatically for `binary_sensor.*` entities. |
+| `wake_on_touch` | all | `true` | If `false`, mouse/scroll activity is ignored (only mousedown/keydown/touchstart, or motion, count). |
+| `count_mousemove_as_activity` | all | `true` | Whether mouse movement (not just clicks) resets the idle timer / wakes the screensaver. |
+| `count_scroll_as_activity` | all | `true` | Whether scroll/wheel events count as activity. |
+
+Navigation is disabled entirely while a dashboard is in edit mode.
+
+### Safety
+
+- A shared circuit breaker pauses all navigation for 5 minutes if more than
+  8 navigations happen within 10 seconds, regardless of cause.
+- `navigation_path` values are auto-corrected to start with `/`, and
+  refused outright if they ever grow past 200 characters - both guard
+  against a runaway navigation loop.
 
 ## Versioning
 
-Releases are tagged `YYYY.MM.DD.#` (e.g. `2026.09.12.1`).
+Releases are tagged `YYYY.MM.DD.#` (e.g. `2026.09.12.2`).
 
 ## License
 
