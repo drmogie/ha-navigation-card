@@ -1,8 +1,5 @@
 # HA Navigation Card
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=drmogie&repository=ha-navigation-card&category=plugin)
-[![Open your Home Assistant instance and show your dashboard resources.](https://my.home-assistant.io/badges/lovelace_resources.svg)](https://my.home-assistant.io/redirect/lovelace_resources/)
-
 A background (non-visual) Home Assistant Lovelace card that watches for user
 inactivity on a kiosk/wall-mounted dashboard and automatically navigates to
 an "idle" view (e.g. a screensaver dashboard). As soon as the user interacts
@@ -15,11 +12,15 @@ releases, with a full visual (GUI) configuration editor - no YAML required.
 
 ### HACS (recommended)
 
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=drmogie&repository=ha-navigation-card&category=plugin)
+
 1. In HACS, go to **Frontend** > menu (top right) > **Custom repositories**.
 2. Add this repository URL, category **Lovelace**.
 3. Install **HA Navigation Card** and reload your browser.
 
 ### Manual
+
+[![Open your Home Assistant instance and show your dashboard resources.](https://my.home-assistant.io/badges/lovelace_resources.svg)](https://my.home-assistant.io/redirect/lovelace_resources/)
 
 1. Copy `ha-navigation-card.js` and `ha-navigation-card-editor.js` into
    `config/www/ha-navigation-card/`.
