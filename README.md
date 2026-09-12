@@ -41,14 +41,17 @@ mounts (page load or return) and on any real activity event.
 
 [![Open your Home Assistant instance and show your dashboard resources.](https://my.home-assistant.io/badges/lovelace_resources.svg)](https://my.home-assistant.io/redirect/lovelace_resources/)
 
-1. Copy `ha-navigation-card.js` into `config/www/ha-navigation-card/`.
+1. Copy **both** `ha-navigation-card.js` and `lit-core.min.js` into
+   `config/www/ha-navigation-card/` (same folder — the card imports the
+   bundle by relative path).
 2. Add the resource in **Settings > Dashboards > Resources**:
    - URL: `/local/ha-navigation-card/ha-navigation-card.js`
    - Type: JavaScript Module
 
-> **Requires internet access.** The card loads Lit from a public CDN
-> (`unpkg.com`) at runtime. If your Home Assistant instance can't reach the
-> internet, or your network blocks `unpkg.com`, the card will fail to load.
+`lit-core.min.js` is a vendored, self-contained build of the
+[Lit](https://lit.dev) library (BSD-3-Clause, © Google LLC) with no
+imports of its own, so the card works fully offline - no CDN, no internet
+access required at dashboard-load time.
 
 ## Usage
 
@@ -96,7 +99,7 @@ Navigation is disabled entirely while a dashboard is in edit mode.
 
 ## Versioning
 
-Releases are tagged `YYYY.MM.DD.#` (e.g. `2026.09.12.2`).
+Releases are tagged `YYYY.MM.DD.#` (e.g. `2026.09.12.3`).
 
 ## License
 

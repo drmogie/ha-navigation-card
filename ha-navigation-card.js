@@ -1,4 +1,4 @@
-import { LitElement, html, css } from "https://unpkg.com/lit@2.8.0/index.js?module";
+import { LitElement, html, css } from "./lit-core.min.js";
 
 /**
  * ha-navigation-card.js
@@ -51,13 +51,19 @@ import { LitElement, html, css } from "https://unpkg.com/lit@2.8.0/index.js?modu
  * debug: false
  *
  * INSTALL
- * 1. Copy to <config>/www/ha-navigation-card/ha-navigation-card.js
+ * 1. Copy both ha-navigation-card.js AND lit-core.min.js (same folder,
+ *    same relative path — the import above is a plain relative import)
+ *    to <config>/www/ha-navigation-card/
  * 2. Settings -> Dashboards -> Resources -> Add Resource
  *      URL: /local/ha-navigation-card/ha-navigation-card.js   Type: JavaScript Module
  * 3. Add the card (type: custom:ha-navigation-card) to any always-on view.
+ *
+ * lit-core.min.js is a vendored, self-contained build of the "lit" library
+ * (no external imports of its own) so this card never needs internet
+ * access at dashboard-load time. See that file's header for provenance.
  */
 
-const CARD_VERSION = "2026.09.12.2";
+const CARD_VERSION = "2026.09.12.3";
 const MIN_TIMEOUT = 3; // seconds; floor to prevent 0/null causing a rapid re-trigger loop
 
 /* ───────── module-level state, survives card re-creation across a view swap ─────────
