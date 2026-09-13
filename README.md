@@ -1,4 +1,4 @@
-# HA Navigation Card
+# Navigation Card
 
 A background (non-visual by default) Home Assistant Lovelace card for
 kiosk/wall-mounted dashboards. It drives navigation between views based on
@@ -35,7 +35,7 @@ mounts (page load or return) and on any real activity event.
 
 1. In HACS, go to **Frontend** > menu (top right) > **Custom repositories**.
 2. Add this repository URL, category **Lovelace**.
-3. Install **HA Navigation Card** and reload your browser.
+3. Install **Navigation Card** and reload your browser.
 
 ### Manual
 
