@@ -63,7 +63,7 @@ import { LitElement, html, css } from "./lit-core.min.js";
  * access at dashboard-load time. See that file's header for provenance.
  */
 
-const CARD_VERSION = "2026.09.20.01";
+const CARD_VERSION = "2026.09.20.02";
 const MIN_TIMEOUT = 3; // seconds; floor to prevent 0/null causing a rapid re-trigger loop
 
 /* ───────── module-level state, survives card re-creation across a view swap ─────────
@@ -111,6 +111,18 @@ const CARD_DEFAULTS = {
   count_mousemove_as_activity: true,
   count_scroll_as_activity: true,
 };
+
+// Shared by the card (_effectiveShowProgress below) and the editor's
+// displayData, so the "Show progress bar" toggle always matches what the
+// card actually renders instead of showing "off" for an inferred-on
+// default (e.g. back mode with show_progress left unset).
+function effectiveShowProgress(config) {
+  if (!config) return false;
+  if (config.navigation_mode === "screensaver") return false; // no countdown to show
+  if (config.show_progress === true) return true;
+  if (config.show_progress === false) return false;
+  return config.navigation_mode === "back"; // auto default
+}
 
 class HaNavigationCard extends LitElement {
   static properties = {
@@ -202,7 +214,7 @@ class HaNavigationCard extends LitElement {
     return {
       navigation_mode: "screensaver",
       wake_on_touch: true,
-      debug: true,
+      debug: false,
     };
   }
 
@@ -243,10 +255,7 @@ class HaNavigationCard extends LitElement {
   }
 
   _effectiveShowProgress() {
-    if (this.config.navigation_mode === "screensaver") return false; // no countdown to show
-    if (this.config.show_progress === true) return true;
-    if (this.config.show_progress === false) return false;
-    return this.config.navigation_mode === "back"; // auto default
+    return effectiveShowProgress(this.config);
   }
 
   set hass(hass) {
@@ -892,7 +901,8 @@ class HaNavigationCardEditor extends LitElement {
     // config, and ha-form displays a missing boolean as off — even when
     // the card's real default is true. Merging CARD_DEFAULTS underneath
     // makes the toggles match what's actually running.
-    const displayData = { ...CARD_DEFAULTS, ...this._config };
+    const merged = { ...CARD_DEFAULTS, ...this._config };
+    const displayData = { ...merged, show_progress: effectiveShowProgress(merged) };
     return html`
       <ha-form
         .hass=${this.hass}
