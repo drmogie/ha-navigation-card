@@ -63,7 +63,7 @@ import { LitElement, html, css } from "./lit-core.min.js";
  * access at dashboard-load time. See that file's header for provenance.
  */
 
-const CARD_VERSION = "2026.09.20.02";
+const CARD_VERSION = "2026.09.20.03";
 const MIN_TIMEOUT = 3; // seconds; floor to prevent 0/null causing a rapid re-trigger loop
 
 /* ───────── module-level state, survives card re-creation across a view swap ─────────
@@ -956,7 +956,7 @@ customElements.define("ha-navigation-card", HaNavigationCard);
 window.customCards = window.customCards || [];
 window.customCards.push({
   type: "ha-navigation-card",
-  name: `Navigation Card (${CARD_VERSION})`,
+  name: "Navigation Card",
   description: "Idle timeout navigation: back / path / screensaver (always-listening) / none.",
   preview: false,
 });

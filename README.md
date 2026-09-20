@@ -99,7 +99,8 @@ Navigation is disabled entirely while a dashboard is in edit mode.
 
 ## Versioning
 
-Releases are tagged `YYYY.MM.DD.#` (e.g. `2026.09.12.3`).
+Releases are tagged `YYYY.MM.DD.##` (e.g. `2026.09.20.03`). See
+[CHANGELOG.md](CHANGELOG.md) for release history.
 
 ## License
 
