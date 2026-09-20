@@ -63,7 +63,7 @@ import { LitElement, html, css } from "./lit-core.min.js";
  * access at dashboard-load time. See that file's header for provenance.
  */
 
-const CARD_VERSION = "2026.09.12.3";
+const CARD_VERSION = "2026.09.20.01";
 const MIN_TIMEOUT = 3; // seconds; floor to prevent 0/null causing a rapid re-trigger loop
 
 /* ───────── module-level state, survives card re-creation across a view swap ─────────
@@ -212,6 +212,34 @@ class HaNavigationCard extends LitElement {
 
   getCardSize() {
     return this.config.debug || this._effectiveShowProgress() || this._isEditMode() ? 1 : 0;
+  }
+
+  // Sections-view analogue of getCardSize() above - same three
+  // conditions (debug panel / progress bar / edit-mode banner), sized
+  // for what's actually rendered in each state. Per HA's own developer
+  // docs, leaving `rows` undefined tells the sections grid to ignore
+  // row sizing for this card, used here for the fully-invisible state
+  // (the common case: screensaver mode, or back/path with both the
+  // progress bar and debug panel off) so it doesn't reserve an empty
+  // row. Best-effort per that documented behavior - not yet confirmed
+  // live on a real Sections dashboard whether an undefined `rows`
+  // truly reserves zero cells or still falls back to some minimum; if
+  // it does, that's a layout-engine floor, not something this card can
+  // work around further.
+  getGridOptions() {
+    if (this.config.debug) {
+      // Tallest, variable-length state (grows with whether a
+      // motion_entity is configured, circuit-breaker status, etc.) -
+      // give it real room and let the user resize via the dashboard's
+      // own edit-mode drag handles.
+      return { columns: 12, rows: 6, min_rows: 3 };
+    }
+    if (this._effectiveShowProgress() || this._isEditMode()) {
+      // Progress bar or the edit-mode banner alone - both a single
+      // compact row.
+      return { columns: 12, rows: 1, min_rows: 1 };
+    }
+    return { columns: 12 };
   }
 
   _effectiveShowProgress() {
